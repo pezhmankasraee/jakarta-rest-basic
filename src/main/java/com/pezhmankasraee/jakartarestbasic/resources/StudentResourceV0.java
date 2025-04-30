@@ -34,8 +34,8 @@ public class StudentResourceV0 {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Student student = objectMapper.readValue(studentJsonString, Student.class);
-            studentService.add(student);
-            return Response.accepted().build();
+            Student studentResponse = studentService.add(student);
+            return Response.ok(studentResponse).status(Response.Status.ACCEPTED).build();
         } catch (JsonProcessingException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -49,12 +49,11 @@ public class StudentResourceV0 {
         var objectMapper = new ObjectMapper();
         try {
             List<Student> studentList = objectMapper.readValue(studentJsonListOfString, new TypeReference<List<Student>>() {});
-            studentService.addAll(studentList);
-            return Response.accepted().build();
+            List<Student> studentListResponse = studentService.addAll(studentList);
+            return Response.ok(studentListResponse).status(Response.Status.ACCEPTED).build();
         } catch (JsonProcessingException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-
     }
 
 }
