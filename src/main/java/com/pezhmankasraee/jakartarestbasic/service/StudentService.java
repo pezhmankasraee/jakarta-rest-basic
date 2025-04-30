@@ -19,4 +19,8 @@ public class StudentService {
     public void add(Student student) {
         this.studentList.add(student);
     }
+
+    public void addAll(List<Student> studentList) {
+        this.studentList.addAll(studentList);
+    }
 }
