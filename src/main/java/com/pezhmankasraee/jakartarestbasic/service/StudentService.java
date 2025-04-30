@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class StudentService {
@@ -16,11 +17,16 @@ public class StudentService {
         return this.studentList;
     }
 
-    public void add(Student student) {
+    public Student add(Student student) {
+        student.setId(UUID.randomUUID());
         this.studentList.add(student);
+        return student;
     }
 
-    public void addAll(List<Student> studentList) {
+    public List<Student> addAll(List<Student> studentList) {
+
+        studentList.forEach(student -> student.setId(UUID.randomUUID()));
         this.studentList.addAll(studentList);
+        return (studentList);
     }
 }
