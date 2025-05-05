@@ -10,7 +10,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("v0/students")
 public class StudentResourceV0 {
@@ -49,11 +51,21 @@ public class StudentResourceV0 {
         var objectMapper = new ObjectMapper();
         try {
             List<Student> studentList = objectMapper.readValue(studentJsonListOfString, new TypeReference<List<Student>>() {});
-            List<Student> studentListResponse = studentService.addAll(studentList);
-            return Response.ok(studentListResponse).status(Response.Status.ACCEPTED).build();
+
+            Long numberOfRecordsStored = studentService.addAll(studentList);
+            String responseJson = createResponseJson(numberOfRecordsStored, objectMapper);
+
+            return Response.ok(responseJson).status(Response.Status.ACCEPTED).build();
         } catch (JsonProcessingException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+    }
+
+    private String createResponseJson(Long numberOfRecordsStored, ObjectMapper objectMapper) throws JsonProcessingException {
+        Map<String, Long> responseMap = new HashMap<>();
+        responseMap.put("numberOfStoredStudents", numberOfRecordsStored);
+
+        return objectMapper.writeValueAsString(responseMap);
     }
 
 }

@@ -25,9 +25,8 @@ public class StudentService {
         return studentPersistence.save(student);
     }
 
-    public List<Student> addAll(List<Student> studentList) {
+    public long addAll(List<Student> studentList) {
 
-        this.studentList.addAll(studentList);
-        return (studentList);
+        return (this.studentPersistence.saveAll(studentList));
     }
 }
