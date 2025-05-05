@@ -1,18 +1,23 @@
 package com.pezhmankasraee.jakartarestbasic.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-
-import java.util.UUID;
 
 @Builder (setterPrefix = "with")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Student {
 
-    private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String fullname;
     private long yearOfBirth;
     @Email

@@ -1,14 +1,18 @@
 package com.pezhmankasraee.jakartarestbasic.service;
 
 import com.pezhmankasraee.jakartarestbasic.models.Student;
+import com.pezhmankasraee.jakartarestbasic.persistence.StudentPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @ApplicationScoped
 public class StudentService {
+
+    @Inject
+    private StudentPersistence studentPersistence;
 
     private final List<Student> studentList = new ArrayList<>();
 
@@ -18,14 +22,11 @@ public class StudentService {
     }
 
     public Student add(Student student) {
-        student.setId(UUID.randomUUID());
-        this.studentList.add(student);
-        return student;
+        return studentPersistence.save(student);
     }
 
     public List<Student> addAll(List<Student> studentList) {
 
-        studentList.forEach(student -> student.setId(UUID.randomUUID()));
         this.studentList.addAll(studentList);
         return (studentList);
     }
