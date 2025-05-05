@@ -1,0 +1,25 @@
+package com.pezhmankasraee.jakartarestbasic.persistence;
+
+import com.pezhmankasraee.jakartarestbasic.models.Student;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+
+@Stateless
+public class StudentPersistence {
+
+    @PersistenceContext(unitName = "persistenceUnit")
+    private EntityManager entityManager;
+
+    @Transactional
+    public Student save(Student student) {
+        entityManager.persist(student);
+        entityManager.flush();
+        return student;
+    }
+
+    public Student find(long id) {
+       return entityManager.find(Student.class, id);
+    }
+}
