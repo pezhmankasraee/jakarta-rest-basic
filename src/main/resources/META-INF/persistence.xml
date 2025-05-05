@@ -4,6 +4,9 @@
         <jta-data-source>jdbc/H2PoolResource</jta-data-source>
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="hibernate.jdbc.batch_size" value="50"/>
+            <property name="hibernate.order_inserts" value="true"/> <!-- batch size mentioned above can affect for INSERT -->
+            <property name="hibernate.order_updates" value="true"/> <!-- batch size mentioned above can affect for UPDATE -->
         </properties>
     </persistence-unit>
 </persistence>
