@@ -14,11 +14,9 @@ public class StudentService {
     @Inject
     private StudentPersistence studentPersistence;
 
-    private final List<Student> studentList = new ArrayList<>();
-
 
     public List<Student> getAllStudents() {
-        return this.studentList;
+        return this.studentPersistence.getAll();
     }
 
     public Student add(Student student) {

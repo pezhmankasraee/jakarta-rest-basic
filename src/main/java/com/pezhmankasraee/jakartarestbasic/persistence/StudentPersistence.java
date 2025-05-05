@@ -34,4 +34,9 @@ public class StudentPersistence {
 
         return studentList.size();
     }
+
+    public List<Student> getAll() {
+
+        return entityManager.createQuery("SELECT s FROM STUDENT s", Student.class).getResultList();
+    }
 }
