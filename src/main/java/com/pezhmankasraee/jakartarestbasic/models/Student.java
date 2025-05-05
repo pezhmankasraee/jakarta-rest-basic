@@ -12,7 +12,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "STUDENT")
 public class Student {
 
     @Id
