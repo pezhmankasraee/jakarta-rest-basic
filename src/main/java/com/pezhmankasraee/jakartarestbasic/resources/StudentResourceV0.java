@@ -7,6 +7,7 @@ import com.pezhmankasraee.jakartarestbasic.dto.BulkStudentRequest;
 import com.pezhmankasraee.jakartarestbasic.models.Student;
 import com.pezhmankasraee.jakartarestbasic.service.StudentService;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -36,16 +37,15 @@ public class StudentResourceV0 {
     @Path("/single")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addStudent(String studentJsonString) {
+    public Response addStudent(@Valid Student student) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Student student = objectMapper.readValue(studentJsonString, Student.class);
-            Student studentResponse = studentService.add(student);
-            return Response.ok(studentResponse).status(Response.Status.ACCEPTED).build();
-        } catch (JsonProcessingException e) {
+        if (student == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
+        Student studentResponse = studentService.add(student);
+        return Response.ok(studentResponse).status(Response.Status.ACCEPTED).build();
+
     }
 
     @POST
