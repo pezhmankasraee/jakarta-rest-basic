@@ -3,12 +3,15 @@ package com.pezhmankasraee.jakartarestbasic.resources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pezhmankasraee.jakartarestbasic.dto.BulkStudentRequest;
 import com.pezhmankasraee.jakartarestbasic.models.Student;
 import com.pezhmankasraee.jakartarestbasic.service.StudentService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,8 @@ import java.util.Map;
 
 @Path("v0/students")
 public class StudentResourceV0 {
+
+    private final static Logger logger = LogManager.getLogger(StudentResourceV0.class);
 
     @Inject
     private StudentService studentService;
@@ -65,11 +70,23 @@ public class StudentResourceV0 {
     @Path("/{id}")
     public Response delete(@PathParam("id") Long id) {
 
-        try {
-            this.studentService.delete(id);
-        } catch (Exception e) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        this.studentService.delete(id);
+        return Response.accepted().build();
+    }
+
+    @POST
+    @Path("/bulk-delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteAll(BulkStudentRequest bulkStudentRequest) {
+
+        if (bulkStudentRequest == null || bulkStudentRequest.getIds() == null || bulkStudentRequest.getIds().isEmpty()) {
+
+            logger.error("Request is invalid");
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
+        this.studentService.deleteAll(bulkStudentRequest.getIds());
+        logger.info(bulkStudentRequest.getIds());
 
         return Response.accepted().build();
     }
@@ -82,5 +99,3 @@ public class StudentResourceV0 {
     }
 
 }
-
-

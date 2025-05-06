@@ -27,8 +27,13 @@ public class StudentService {
         return (this.studentPersistence.saveAll(studentList));
     }
 
-    public void delete(long studentId) throws Exception {
+    public void delete(long studentId) {
 
         this.studentPersistence.delete(studentId);
+    }
+
+    public void deleteAll(List<Long> ids) {
+
+        ids.forEach(studentId -> this.studentPersistence.delete(studentId));
     }
 }

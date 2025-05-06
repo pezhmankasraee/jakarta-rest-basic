@@ -40,12 +40,12 @@ public class StudentPersistence {
         return entityManager.createQuery("SELECT s FROM STUDENT s", Student.class).getResultList();
     }
 
-    public void delete(long studentId) throws Exception {
+    @Transactional
+    public void delete(long studentId) {
 
         Student student = entityManager.find(Student.class, studentId);
-        if(student == null) {
-            throw new Exception("Student with id: " + studentId + " was not found");
+        if(student != null) {
+            entityManager.remove(student);
         }
-        entityManager.remove(student);
     }
 }
