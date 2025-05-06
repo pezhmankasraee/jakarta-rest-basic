@@ -51,19 +51,16 @@ public class StudentResourceV0 {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addList(String studentJsonListOfString) {
+    public Response addList(@Valid List<Student> studentList) {
 
-        var objectMapper = new ObjectMapper();
-        try {
-            List<Student> studentList = objectMapper.readValue(studentJsonListOfString, new TypeReference<List<Student>>() {});
-
-            Long numberOfRecordsStored = studentService.addAll(studentList);
-            String responseJson = createResponseJson(numberOfRecordsStored, objectMapper);
-
-            return Response.ok(responseJson).status(Response.Status.ACCEPTED).build();
-        } catch (JsonProcessingException e) {
+        if(studentList == null || studentList.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
+        Long numberOfRecordsStored = studentService.addAll(studentList);
+        String responseJson = createResponseJson(numberOfRecordsStored);
+
+        return Response.ok(responseJson).status(Response.Status.ACCEPTED).build();
     }
 
     @DELETE
@@ -91,11 +88,9 @@ public class StudentResourceV0 {
         return Response.accepted().build();
     }
 
-    private String createResponseJson(Long numberOfRecordsStored, ObjectMapper objectMapper) throws JsonProcessingException {
-        Map<String, Long> responseMap = new HashMap<>();
-        responseMap.put("numberOfStoredStudents", numberOfRecordsStored);
+    private String createResponseJson(Long numberOfRecordsStored) {
 
-        return objectMapper.writeValueAsString(responseMap);
+        return "{ \"numberOfStoredStudents\" : " + numberOfRecordsStored + " }";
     }
 
 }
