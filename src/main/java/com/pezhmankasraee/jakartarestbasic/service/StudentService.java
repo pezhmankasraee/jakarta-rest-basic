@@ -5,7 +5,6 @@ import com.pezhmankasraee.jakartarestbasic.persistence.StudentPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -26,5 +25,10 @@ public class StudentService {
     public long addAll(List<Student> studentList) {
 
         return (this.studentPersistence.saveAll(studentList));
+    }
+
+    public void delete(long studentId) throws Exception {
+
+        this.studentPersistence.delete(studentId);
     }
 }

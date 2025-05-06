@@ -27,8 +27,8 @@ public class StudentResourceV0 {
         return this.studentService.getAllStudents();
     }
 
-    @Path("/single")
     @POST()
+    @Path("/single")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addStudent(String studentJsonString) {
@@ -59,6 +59,19 @@ public class StudentResourceV0 {
         } catch (JsonProcessingException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+
+        try {
+            this.studentService.delete(id);
+        } catch (Exception e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.accepted().build();
     }
 
     private String createResponseJson(Long numberOfRecordsStored, ObjectMapper objectMapper) throws JsonProcessingException {
