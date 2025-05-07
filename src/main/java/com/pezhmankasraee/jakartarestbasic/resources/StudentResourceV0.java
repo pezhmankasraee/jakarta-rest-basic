@@ -1,8 +1,5 @@
 package com.pezhmankasraee.jakartarestbasic.resources;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pezhmankasraee.jakartarestbasic.dto.BulkStudentRequest;
 import com.pezhmankasraee.jakartarestbasic.models.Student;
 import com.pezhmankasraee.jakartarestbasic.service.StudentService;
@@ -14,9 +11,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Path("v0/students")
 public class StudentResourceV0 {
