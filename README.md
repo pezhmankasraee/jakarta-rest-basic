@@ -1205,3 +1205,125 @@ Citations:
 
 ---
 Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output
+
+
+
+
+When designing JPA entity relationships, **the owning side** is the entity that manages the association in the database (for example, by updating the join table in a many-to-many relationship). The **inverse side** simply reflects the relationship and relies on the owning side for changes.
+
+Here’s how to decide which side should be the owning side, and what factors help you choose:
+
+---
+
+## **General Rules for Choosing the Owning Side**
+
+### **Many-to-Many (`@ManyToMany`)**
+
+- **Either side can be the owning side**-you decide which entity manages the join table by placing the `@JoinTable` annotation there[1][4][5][7].
+- The other side uses `mappedBy` to reference the owning side’s property.
+- **Factors to help decide:**
+    - **Business logic:** Pick the entity from which you most often manage (add/remove) the relationship. For example, if you more often assign courses to students, make `Student` the owning side.
+    - **Clarity:** The side where the relationship is more “natural” to manage in your code.
+    - **Consistency:** If your application’s logic or API is built around one entity, make that the owner for consistency.
+    - **No technical difference:** There’s no impact on the database structure or performance; it’s about which side JPA will use to synchronize changes[1][4][7].
+
+### **One-to-Many / Many-to-One (`@OneToMany`, `@ManyToOne`)**
+
+- **The `@ManyToOne` side is always the owning side**[2][5][8].
+- The foreign key lives in the "many" table, so this side manages the relationship.
+- The `@OneToMany` side is inverse and uses `mappedBy`.
+
+### **One-to-One (`@OneToOne`)**
+
+- **The owning side is the one with the foreign key column**[2][5][6].
+- Typically, you make the side with the foreign key the owner.
+
+---
+
+## **Why Does It Matter?**
+
+- **Only changes on the owning side are persisted:**  
+  If you update the inverse side only, JPA will ignore those changes when saving to the database[2][5][7].
+- **The owning side controls the join table or foreign key.**
+
+---
+
+## **Summary Table**
+
+| Relationship Type     | Who is the Owning Side?                              | How to Decide?                                  |
+|----------------------|------------------------------------------------------|-------------------------------------------------|
+| Many-to-Many         | Either side (your choice, use `@JoinTable` there)    | Pick the side you manage most or prefer logically|
+| One-to-Many/Many-to-One | Always the `@ManyToOne` side                      | Not optional                                    |
+| One-to-One           | Side with the foreign key                            | Usually the side with more logical ownership     |
+
+---
+
+**In summary:**  
+For many-to-many, you can choose either side as the owner-pick the one that fits your application logic best. For other relationships, the rules are fixed by JPA. The owning side is important because only changes made there are actually saved to the database[2][5][7][8].
+
+Would you like a practical example of switching the owning side in a many-to-many relationship?
+
+Citations:
+[1] https://stackoverflow.com/questions/21985308/how-is-the-owning-side-of-this-many-to-many-relationship-determined
+[2] https://symfonycasts.com/screencast/doctrine-relations/owning-vs-inverse
+[3] https://www.javacodegeeks.com/2013/04/jpa-determining-the-owning-side-of-a-relationship.html
+[4] https://symfonycasts.com/screencast/collections/many-to-many-inverse
+[5] https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/unitofwork-associations.html
+[6] https://docs.oracle.com/cd/E19798-01/821-1841/bnbqi/index.html
+[7] https://docs.jmix.io/jmix/data-modeling-many-to-many-guide/index.html
+[8] https://javatechonline.com/entity-relationship-in-jpa-hibernate-orm/
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output
+
+
+You should generally use a `Set` instead of a `List` for many-to-many relationships in JPA because:
+
+---
+
+## **1. Duplicates Are Not Allowed**
+
+- **Set**: Ensures each element is unique-no duplicates.
+- **List**: Allows duplicates, which doesn't make sense for a join table that should only have one link between two entities (e.g., a student enrolled in a course only once)[2][6].
+
+---
+
+## **2. Performance and SQL Efficiency**
+
+- When you use a `List`, JPA/Hibernate may generate extra SQL statements, especially during removal or reordering. It often deletes all join records and reinserts them to match the order in your `List`, which can be inefficient[1][6].
+- With a `Set`, Hibernate can handle add/remove operations more efficiently, issuing only the necessary SQL statements[1][6].
+
+---
+
+## **3. Logical Modeling**
+
+- Many-to-many relationships in relational databases are naturally modeled as sets: a student is either enrolled in a course or not-there's no concept of being enrolled multiple times in the same course.
+- Using a `Set` in your entity reflects this logic in your Java code[2][6].
+
+---
+
+## **Summary Table**
+
+| Collection | Allows Duplicates | Maintains Order | Typical Use in @ManyToMany | Recommended? |
+|------------|-------------------|-----------------|----------------------------|--------------|
+| Set        | No                | No              | Yes                        | **Yes**      |
+| List       | Yes               | Yes             | Possible but not ideal     | No           |
+
+---
+
+**In summary:**  
+Use a `Set` for many-to-many relationships in JPA to avoid duplicates, improve performance, and better reflect the underlying database logic[1][2][6].
+
+Would you like to see a code example or learn when a `List` might be appropriate?
+
+Citations:
+[1] https://dzone.com/articles/why-set-is-better-than-list-in-manytomany
+[2] https://stackoverflow.com/questions/8174667/hibernate-many-to-many-relations-set-or-list
+[3] https://www.baeldung.com/spring-jpa-onetomany-list-vs-set
+[4] https://codingnomads.com/spring-data-jpa-many-to-many-relationship
+[5] https://vladmihalcea.com/the-best-way-to-map-a-many-to-many-association-with-extra-columns-when-using-jpa-and-hibernate/
+[6] https://vladmihalcea.com/the-best-way-to-use-the-manytomany-annotation-with-jpa-and-hibernate/
+[7] https://www.baeldung.com/jpa-many-to-many
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output

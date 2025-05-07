@@ -3,9 +3,12 @@ package com.pezhmankasraee.jakartarestbasic.models;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.Set;
 
 @Builder(setterPrefix = "with")
 @Getter
@@ -19,11 +22,14 @@ public class Course {
     private Long id;
 
     @NotEmpty
-    private String CourseName;
+    private String courseName;
 
     @NotEmpty
     @Size(max = 256)
-    private String Description;
+    private String description;
+
+    @ManyToMany(mappedBy = "courseSet")
+    private Set<Student> studentSet;
 }
 
 
