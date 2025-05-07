@@ -5,6 +5,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -46,6 +47,18 @@ public class StudentPersistence {
         Student student = entityManager.find(Student.class, studentId);
         if(student != null) {
             entityManager.remove(student);
+        }
+    }
+
+    @Transactional
+    public void update(Student student) {
+        Student foundStudent = this.entityManager.find(Student.class, student);
+        if (foundStudent != null) {
+            foundStudent.setFullname(student.getFullname());
+            foundStudent.setEmail(student.getEmail());
+            foundStudent.setNationality(student.getNationality());
+            foundStudent.setYearOfBirth(student.getYearOfBirth());
+            foundStudent.setFieldOfStudy(student.getFieldOfStudy());
         }
     }
 }

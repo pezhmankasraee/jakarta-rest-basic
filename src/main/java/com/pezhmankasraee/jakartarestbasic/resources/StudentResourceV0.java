@@ -88,6 +88,20 @@ public class StudentResourceV0 {
         return Response.accepted().build();
     }
 
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response update(@Valid Student student) {
+
+        if(student == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        this.studentService.update(student);
+
+        return Response.ok().build();
+    }
+
     private String createResponseJson(Long numberOfRecordsStored) {
 
         return "{ \"numberOfStoredStudents\" : " + numberOfRecordsStored + " }";

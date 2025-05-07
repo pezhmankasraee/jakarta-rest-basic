@@ -4,6 +4,7 @@ import com.pezhmankasraee.jakartarestbasic.models.Student;
 import com.pezhmankasraee.jakartarestbasic.persistence.StudentPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -35,5 +36,10 @@ public class StudentService {
     public void deleteAll(List<Long> ids) {
 
         ids.forEach(studentId -> this.studentPersistence.delete(studentId));
+    }
+
+    public void update(@Valid Student student) {
+
+        this.studentPersistence.update(student);
     }
 }
