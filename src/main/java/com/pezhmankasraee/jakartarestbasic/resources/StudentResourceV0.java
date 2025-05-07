@@ -97,9 +97,9 @@ public class StudentResourceV0 {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        this.studentService.update(student);
+        Student updatedStudent = this.studentService.update(student);
 
-        return Response.ok().build();
+        return Response.accepted().entity(updatedStudent).build();
     }
 
     private String createResponseJson(Long numberOfRecordsStored) {

@@ -38,8 +38,8 @@ public class StudentService {
         ids.forEach(studentId -> this.studentPersistence.delete(studentId));
     }
 
-    public void update(@Valid Student student) {
+    public Student update(@Valid Student student) {
 
-        this.studentPersistence.update(student);
+        return this.studentPersistence.update(student);
     }
 }
