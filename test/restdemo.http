@@ -1,0 +1,122 @@
+### GET Hello @test
+GET http://localhost:8080/restdemo/api/rest/hello
+Accept: application/json
+Content-type: plain/text
+
+
+### GET Students @test
+GET http://localhost:8080/jakarta-rest-basic/api/v0/students
+Accept: application/json
+Content-Type: text/plain
+
+
+### POST Student @test
+POST http://localhost:8080/jakarta-rest-basic/api/v0/students
+Accept: application/json
+Content-Type: application/json
+
+[
+    {
+        "email": "linda@chemistry.ch",
+        "fieldOfStudy": "Chemistry",
+        "fullname": "Linda Potasium",
+        "nationality": "Swiss",
+        "yearOfBirth": 1999
+    }
+]
+
+
+### POST Student @test
+POST http://localhost:8080/jakarta-rest-basic/api/v0/students/single
+Accept: application/json
+Content-Type: application/json
+
+[
+    {
+        "email": "nikol",
+        "fieldOfStudy": "Computer Science",
+        "fullname": "Linda Potasium",
+        "nationality": "Italian",
+        "yearOfBirth": 1939
+    }
+]
+  
+### POST List of Students @test
+POST http://localhost:8080/jakarta-rest-basic/api/v0/students
+Accept: application/json
+Content-Type: application/json
+
+[
+    {
+        "email": "me@pezhmankasraee.com",
+        "fieldOfStudy": "Software Engineering",
+        "fullname": "Pezhman Kasraee",
+        "nationality": "Swedish",
+        "yearOfBirth": 1976
+    },
+    {
+        "email": "imes76@gmail.com",
+        "fieldOfStudy": "teaching education",
+        "fullname": "Matilda Svensson",
+        "nationality": "Swedish",
+        "yearOfBirth": 1976
+    },
+    {
+        "email": "arman.farsa@gmail.com",
+        "fieldOfStudy": "Software Engineering",
+        "fullname": "Arman Farsa",
+        "nationality": "Iranian",
+        "yearOfBirth": 2006
+    }
+]
+
+
+### DELETE Student @test
+DELETE http://localhost:8080/jakarta-rest-basic/api/v0/students/222
+Acccept: application/json
+
+
+### DELETE Student bulk @test
+POST http://localhost:8080/jakarta-rest-basic/api/v0/students/bulk-delete
+Accept: application/json
+Content-Type: application/json
+
+{
+    "ids": [5,6,7,8]
+}
+
+
+### (WRONG BODY) DELETE Student bulk @test
+POST http://localhost:8080/jakarta-rest-basic/api/v0/students/bulk-delete
+Accept: application/json
+Content-Type: application/json
+
+{
+    "xxx": [11,22,33]
+}
+
+
+### DELETE Student bulk @test
+curl -X POST \
+  http://localhost:8080/jakarta-rest-basic/api/v0/students/bulk-delete \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{
+        "ids": [5,6,7,8]
+      }'
+
+
+
+### PUT Student @test
+PUT http://localhost:8080/jakarta-rest-basic/api/v0/students
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "me@pennyk.se",
+    "fieldOfStudy": "Software Engineering",
+    "fullname": "Penny Karlsson",
+    "id": 14,
+    "nationality": "Swedish",
+    "yearOfBirth": 2946
+}

@@ -5,9 +5,8 @@ import jakarta.ws.rs.core.Application;
 
 /**
  * Configures Jakarta RESTful Web Services for the application.
- * @author Juneau
+ * @author Pezhman Kasraee
  */
 @ApplicationPath("api")
 public class JakartaRestConfiguration extends Application {
-    
 }

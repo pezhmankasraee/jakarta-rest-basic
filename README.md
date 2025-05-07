@@ -666,3 +666,228 @@ Citations:
 
 ---
 Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output
+
+
+
+Certainly! Here’s a layman’s explanation of those two points:
+
+---
+
+## **1. Exceptions Thrown Outside of JAX-RS Resource Handling**
+
+Imagine your REST API as a series of steps:
+
+1. **Step 1:** The server receives the HTTP request.
+2. **Step 2:** The server tries to convert (deserialize) the incoming JSON into your Java object.
+3. **Step 3:** If successful, your resource method (your Java code) runs.
+4. **Step 4:** The server sends back a response.
+
+**If something goes wrong in Step 2** (for example, the JSON is badly formatted, a required field is missing, or the data type is wrong), the error happens *before* your code runs.  
+At this point, the server itself (not your code) throws the exception.  
+Because of this, your custom error handlers (ExceptionMappers) in JAX-RS might not get a chance to handle the error and return a JSON response. Instead, the server might return a default HTML error page[6][9].
+
+---
+
+## **2. Exception Type Not Caught by Your Mapper**
+
+Your ExceptionMapper only catches exceptions of the type you specify.  
+If the error is a different type (for example, a low-level server error or something handled by the underlying web server or JAX-RS internals), your mapper won’t be used[2][5].
+
+For example:
+- If you write a mapper for `ConstraintViolationException`, but the error is a `BadRequestException` or a JSON parsing exception, your mapper won’t catch it unless you also write mappers for those types.
+- Some errors (like HTTP 404 Not Found) are handled by the server, not by your code, so your mappers never see them[2][5][7].
+
+---
+
+## **Summary Table**
+
+| Where Error Happens            | Who Handles It          | Can Your Mapper Catch It? |
+|-------------------------------|-------------------------|---------------------------|
+| Before your code runs (parsing/deserialization) | Server/Framework          | Usually **No**            |
+| Inside your resource method    | Your code/JAX-RS        | **Yes** (if type matches) |
+| Server-level errors (e.g., 404)| Server/Servlet Container| **No**                    |
+
+---
+
+**In short:**  
+Some errors happen so early (or at such a low level) that your custom error handlers never see them. Others are simply not the right type for your mapper to handle. That’s why you sometimes get an HTML error page even though you have ExceptionMappers set up.
+
+Would you like advice on how to handle more of these errors as JSON?
+
+Citations:
+[1] https://dennis-xlc.gitbooks.io/restful-java-with-jax-rs-2-0-2rd-edition/content/en/part1/chapter7/exception_handling.html
+[2] https://docs.redhat.com/en/documentation/red_hat_fuse/7.0/html/apache_cxf_development_guide/restexceptions
+[3] https://github.com/illyfrancis/scribble/blob/master/docs/RESTful%20Java%20with%20JAX-RS%202.0/07%20-%20Server%20Responses%20and%20Exception%20Handling.md
+[4] https://syntaxsavvy.dev/langs/java/tools/jaxrs/handling_errors_using_jax_rs/using_jax_rs_for_error_handling/
+[5] https://abhishek-gupta.gitbook.io/rest-assured-with-jaxrs/jax-rs-providers-part-iii
+[6] https://softwareengineering.stackexchange.com/questions/322961/how-to-deal-with-automatic-binding-exceptions-with-jersey
+[7] https://docs.redhat.com/en/documentation/red_hat_jboss_fuse/6.3/html/apache_cxf_development_guide/restexceptions-jaxrs20
+[8] https://stackoverflow.com/questions/43813940/can-i-deserialize-a-jax-rs-response
+[9] https://syntaxsavvy.dev/langs/java/tools/jaxrs/serializing_and_deserializing_objects_using_jax_rs/using_jax_rs_for_object_serialization_and_deserialization/
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output
+
+
+
+# Exception handling in JAKARTA EE 11
+
+Certainly! Here’s a clear, layered explanation of **where and how exceptions are caught and handled in a Jakarta EE REST (JAX-RS) application**, from the lowest (server) level up to your application code:
+
+---
+
+## **1. Servlet Container Layer (Lowest Level)**
+
+- **What happens:**  
+  The servlet container (e.g., GlassFish, Payara) receives the HTTP request and tries to route it to your JAX-RS application.
+- **Examples of exceptions:**
+    - Malformed HTTP requests (not even valid JSON or HTTP)
+    - Invalid URLs (404 Not Found)
+    - Unsupported HTTP methods (405 Method Not Allowed)
+- **How handled:**  
+  The container itself returns a standard HTML error page or a generic error response.  
+  **Your ExceptionMappers do not see these errors.**
+
+---
+
+## **2. JAX-RS Framework Layer (Before Resource Method)**
+
+- **What happens:**  
+  JAX-RS parses the request, tries to deserialize JSON/XML into Java objects, and validates input using Jakarta Bean Validation.
+- **Examples of exceptions:**
+    - Malformed JSON (bad syntax)
+    - Missing required fields
+    - Validation errors (e.g., `@NotNull` fails)
+    - Parameter binding errors (e.g., wrong data type in query/path param)
+- **How handled:**
+    - Some exceptions (like validation errors) can be caught by your custom `ExceptionMapper` if registered and if the error is thrown after JAX-RS takes control[2][8].
+    - **But:** If the error occurs before JAX-RS hands control to your resource method, or if the error is a type not mapped (e.g., deserialization errors), it may be handled by the framework or container, often resulting in a generic HTML or plain-text error[2].
+    - Some frameworks (like Jersey) throw `BadRequestException` or similar, which you can map with an `ExceptionMapper`.
+
+---
+
+## **3. Resource Method Layer (Your Code)**
+
+- **What happens:**  
+  Your resource method is called (e.g., `@POST`, `@GET`), and your business logic runs.
+- **Examples of exceptions:**
+    - Business logic errors (e.g., user not found, invalid operation)
+    - Uncaught runtime exceptions (e.g., `NullPointerException`)
+- **How handled:**
+    - Any exception thrown here can be caught by your registered `ExceptionMapper` for that type (e.g., `ExceptionMapper`, `ExceptionMapper` for generic errors)[6][8].
+    - The mapper can return a custom JSON response, HTTP status, etc.
+
+---
+
+## **4. Service/Business Layer (Called by Resource)**
+
+- **What happens:**  
+  Your resource method calls service classes, which may throw custom or runtime exceptions.
+- **Examples of exceptions:**
+    - Domain-specific exceptions (e.g., `UserNotFoundException`)
+    - Data access errors
+- **How handled:**
+    - These exceptions bubble up to the resource method, and then are handled as above (by ExceptionMappers, if registered)[1][5].
+
+---
+
+## **Summary Table**
+
+| Layer                     | Example Errors                | Who Handles It                | Can ExceptionMapper Catch? |
+|---------------------------|-------------------------------|-------------------------------|---------------------------|
+| Servlet Container         | 404, 405, malformed HTTP      | Servlet container             | ❌ (No)                   |
+| JAX-RS Framework (pre-resource) | Malformed JSON, validation fails | JAX-RS, Bean Validation, or container | Sometimes (if type mapped and after JAX-RS takes control) |
+| Resource Method (your code) | Business logic, runtime errors | Your ExceptionMappers         | ✅ (Yes)                  |
+| Service/Business Layer    | Domain/business exceptions    | Bubble up to resource method  | ✅ (Yes, if not caught earlier) |
+
+---
+
+## **Key Points**
+
+- **Not all errors reach your ExceptionMappers.**  
+  Some are handled by the server or framework before your code runs.
+- **ExceptionMappers work best for exceptions thrown in or after your resource methods.**
+- **For full JSON error coverage:**
+    - Register mappers for common framework exceptions (e.g., `ConstraintViolationException`, `BadRequestException`).
+    - Accept that some errors (like 404 or malformed HTTP) will be handled by the servlet container, unless you configure custom error pages at the server level.
+
+---
+
+**Would you like practical examples of mappers for each layer, or advice on configuring server-level error handling for JSON responses?**
+
+Citations:
+[1] https://stackoverflow.com/questions/73545416/rest-api-exception-handling-identify-layer
+[2] https://blog.payara.fish/nugget-friday-exploring-jakarta-restful-jax-rs-web-services-validation
+[3] https://www.baeldung.com/exception-handling-for-rest-with-spring
+[4] https://quarkus.io/guides/rest
+[5] https://softwareengineering.stackexchange.com/questions/359558/multi-layered-architecture-where-i-should-implement-the-error-logging-handlin
+[6] https://docs.jboss.org/resteasy/docs/6.2.8.Final/userguide/html/ch30.html
+[7] https://spring.io/blog/2013/11/01/exception-handling-in-spring-mvc
+[8] https://blog.payara.fish/returning-beautiful-validation-error-messages-in-jakarta-rest-with-exception-mappers
+[9] https://www.youtube.com/watch?v=eKY1fxwxdVM
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output
+
+
+
+You might need to override `getClasses()` in your `JakartaRestConfiguration` (your class extending `Application`) **to explicitly control which resource and provider classes are registered in your Jakarta REST (JAX-RS) application**[4][5][8][9].
+
+---
+
+## **Why Use `getClasses()`?**
+
+- **Explicit Registration:**  
+  By default, Jakarta REST will scan your application for all classes annotated with resource (`@Path`) or provider (`@Provider`) annotations and register them automatically[4][5][9].
+- **Custom Control:**  
+  If you override `getClasses()` and return a non-empty set, **only** the classes you list will be registered as REST resources or providers (such as ExceptionMappers)[4][5][8].
+- **Use Cases:**
+    - You want to control exactly which endpoints and providers are available (for security, modularity, or testing).
+    - You want to avoid classpath scanning (for performance or deployment reasons).
+    - You need to register resources/providers that are not annotated or are created programmatically.
+
+---
+
+## **How It Works**
+
+- If you **do not override** `getClasses()` or `getSingletons()`, Jakarta REST scans and registers all annotated classes it finds in your application[4][5].
+- If you **do override** `getClasses()` or `getSingletons()` and return a non-empty set, **only** those classes are registered-automatic scanning is disabled[5][8].
+
+---
+
+## **Example**
+
+```java
+@ApplicationPath("/api")
+public class JakartaRestConfiguration extends Application {
+    @Override
+    public Set> getClasses() {
+        Set> classes = new HashSet<>();
+        classes.add(MyResource.class);
+        classes.add(MyExceptionMapper.class);
+        // Add more resources/providers as needed
+        return classes;
+    }
+}
+```
+
+---
+
+**In summary:**  
+Override `getClasses()` when you want full control over which REST resources and providers are part of your application. If you do, remember to list all resources and providers you need, as automatic scanning will be turned off[4][5][8][9].
+
+Would you like to see when it’s better to rely on scanning vs. explicit registration?
+
+Citations:
+[1] https://blog.payara.fish/getting-started-with-jakarta-ee-10-jakarta-rest
+[2] https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html
+[3] https://stackoverflow.com/questions/45301919/configuration-class-that-extends-application-in-rest
+[4] https://jakarta.ee/learn/docs/jakartaee-tutorial/current/websvcs/rest/rest.html
+[5] https://docs.redhat.com/en/documentation/red_hat_jboss_enterprise_application_platform/7.4/html/developing_web_services_applications/developing_jakarta_restful_web_services_web_services
+[6] https://docs.jboss.org/resteasy/docs/6.2.7.Final/userguide/html/ch30.html
+[7] https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/ClassLoader.html
+[8] https://javanexus.com/blog/configuring-exceptionmapper-jax-rs
+[9] https://mincong.io/2018/12/03/exception-handling-in-jax-rs/
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/i-am-going-to-use-persistence-NBRlJQ2QTcuPEFDD9r79gA?31=d&utm_source=copy_output

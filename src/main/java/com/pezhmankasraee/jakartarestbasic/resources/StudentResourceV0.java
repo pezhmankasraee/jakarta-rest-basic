@@ -16,10 +16,14 @@ import java.util.List;
 @Path("v0/students")
 public class StudentResourceV0 {
 
-    private final static Logger logger = LogManager.getLogger(StudentResourceV0.class);
+    private static final Logger logger = LogManager.getLogger(StudentResourceV0.class);
+
+    private final StudentService studentService;
 
     @Inject
-    private StudentService studentService;
+    public StudentResourceV0(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
