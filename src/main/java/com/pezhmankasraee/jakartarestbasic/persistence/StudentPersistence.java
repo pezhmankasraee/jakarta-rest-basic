@@ -51,8 +51,11 @@ public class StudentPersistence {
     }
 
     @Transactional
-    public void update(Student student) {
-        Student foundStudent = this.entityManager.find(Student.class, student);
+    public Student update(Student student) {
+
+        long studentId = student.getId();
+        Student foundStudent = this.entityManager.find(Student.class, studentId);
+
         if (foundStudent != null) {
             foundStudent.setFullname(student.getFullname());
             foundStudent.setEmail(student.getEmail());
@@ -60,5 +63,7 @@ public class StudentPersistence {
             foundStudent.setYearOfBirth(student.getYearOfBirth());
             foundStudent.setFieldOfStudy(student.getFieldOfStudy());
         }
+
+        return foundStudent;
     }
 }
